@@ -1,0 +1,59 @@
+; -----------------------------------------------------------------------------
+; ACAP-100T PCIe video capture card
+;
+; The device is a standard PCIe endpoint with a 4 kB BAR0 register file.
+; MSI is enabled through the standard Interrupt Management registry value.
+; -----------------------------------------------------------------------------
+[Version]
+Signature="$WINDOWS NT$"
+Class=Media
+ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318}
+Provider=%ACAP%
+DriverVer=11/16/2026,1.0.0.0
+CatalogFile=acap.cat
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%ACAP%=ACAP,NTamd64
+
+[ACAP.NTamd64]
+%ACAP.DeviceDesc%=ACAP_Device, PCI\VEN_1AB2&DEV_1001&SUBSYS_10011AB2&REV_01
+%ACAP.DeviceDesc%=ACAP_Device, PCI\VEN_1AB2&DEV_1001&SUBSYS_10011AB2
+%ACAP.DeviceDesc%=ACAP_Device, PCI\VEN_1AB2&DEV_1001
+
+[ACAP_Device.NT]
+CopyFiles=Drivers_Dir
+
+[ACAP_Device.NT.HW]
+AddReg=ACAP_Device.NT.HW.AddReg
+
+[ACAP_Device.NT.HW.AddReg]
+HKR, "Interrupt Management\MessageSignaledInterruptProperties", MSISupported, 0x00010001, 1
+HKR, "Interrupt Management\MessageSignaledInterruptProperties", MessageNumberLimit, 0x00010001, 1
+
+[ACAP_Device.NT.Wdf]
+KmdfService = acap, ACAP_WdfSection
+
+[ACAP_WdfSection]
+KmdfLibraryVersion = 1.33
+
+[ACAP_Device.NT.Services]
+AddService = acap, 0x00000002, ACAP_Service_Inst
+
+[ACAP_Service_Inst]
+DisplayName = %ACAP.ServiceDesc%
+ServiceType = 1
+StartType = 3
+ErrorControl = 1
+ServiceBinary = %12%\acap.sys
+
+[Drivers_Dir]
+acap.sys
+
+[Strings]
+ACAP = "ACAP"
+ACAP.DeviceDesc = "ACAP-100T PCIe Video Capture"
+ACAP.ServiceDesc = "ACAP-100T Video Capture Driver"

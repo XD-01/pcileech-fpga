@@ -39,10 +39,18 @@ module pcileech_pcie_tlp_a7(
     wire [63:0] nvme_asq;
     wire [63:0] nvme_acq;
     wire [15:0] nvme_sq0_tail;
-    wire [127:0] nvme_msix0;
-    wire [127:0] nvme_msix1;
-    wire [127:0] nvme_msix2;
-    wire [127:0] nvme_msix3;
+    wire [15:0] nvme_sq_tail1;
+    wire [15:0] nvme_sq_tail2;
+    wire [15:0] nvme_sq_tail3;
+    wire [15:0] nvme_sq_tail4;
+    wire [4:0]  nvme_msix_sel;
+    wire [63:0] nvme_msix_addr;
+    wire [31:0] nvme_msix_data;
+    wire        nvme_msix_mask;
+    wire        nvme_pba_set;
+    wire [4:0]  nvme_pba_idx;
+    wire        nvme_pba_clr;
+    wire [4:0]  nvme_pba_clr_idx;
     
     // ------------------------------------------------------------------------
     // Convert received TLPs from PCIe core and transmit onwards:
@@ -62,10 +70,18 @@ module pcileech_pcie_tlp_a7(
         .nvme_asq       ( nvme_asq                      ),
         .nvme_acq       ( nvme_acq                      ),
         .nvme_sq0_tail  ( nvme_sq0_tail                 ),
-        .nvme_msix0     ( nvme_msix0                    ),
-        .nvme_msix1     ( nvme_msix1                    ),
-        .nvme_msix2     ( nvme_msix2                    ),
-        .nvme_msix3     ( nvme_msix3                    )
+        .nvme_sq_tail1  ( nvme_sq_tail1                 ),
+        .nvme_sq_tail2  ( nvme_sq_tail2                 ),
+        .nvme_sq_tail3  ( nvme_sq_tail3                 ),
+        .nvme_sq_tail4  ( nvme_sq_tail4                 ),
+        .nvme_msix_sel  ( nvme_msix_sel                 ),
+        .nvme_msix_addr ( nvme_msix_addr                ),
+        .nvme_msix_data ( nvme_msix_data                ),
+        .nvme_msix_mask ( nvme_msix_mask                ),
+        .nvme_pba_set   ( nvme_pba_set                  ),
+        .nvme_pba_idx   ( nvme_pba_idx                  ),
+        .nvme_pba_clr   ( nvme_pba_clr                  ),
+        .nvme_pba_clr_idx ( nvme_pba_clr_idx            )
     );
     
     pcileech_tlps128_cfgspace_shadow i_pcileech_tlps128_cfgspace_shadow(
@@ -146,10 +162,18 @@ module pcileech_pcie_tlp_a7(
         .asq            ( nvme_asq                      ),
         .acq            ( nvme_acq                      ),
         .sq0_tail       ( nvme_sq0_tail                 ),
-        .msix0          ( nvme_msix0                    ),
-        .msix1          ( nvme_msix1                    ),
-        .msix2          ( nvme_msix2                    ),
-        .msix3          ( nvme_msix3                    ),
+        .sq_tail1       ( nvme_sq_tail1                 ),
+        .sq_tail2       ( nvme_sq_tail2                 ),
+        .sq_tail3       ( nvme_sq_tail3                 ),
+        .sq_tail4       ( nvme_sq_tail4                 ),
+        .msix_sel       ( nvme_msix_sel                 ),
+        .msix_addr      ( nvme_msix_addr                ),
+        .msix_data      ( nvme_msix_data                ),
+        .msix_mask      ( nvme_msix_mask                ),
+        .pba_set        ( nvme_pba_set                  ),
+        .pba_idx        ( nvme_pba_idx                  ),
+        .pba_clr        ( nvme_pba_clr                  ),
+        .pba_clr_idx    ( nvme_pba_clr_idx              ),
         .nvme_cpl       ( tlps_nvme_cpl.sink_lite       ),
         .tlps_out       ( tlps_nvme_tx.source           )
     );

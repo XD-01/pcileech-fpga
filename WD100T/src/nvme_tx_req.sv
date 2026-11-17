@@ -26,6 +26,7 @@ module nvme_tx_req(
     input [63:0]        req_addr,
     input [127:0]       req_wdata,
     input [11:0]        req_len_dw,
+    input [7:0]         req_lid,
     output bit          req_done,
     // outgoing TLP stream
     IfAXIS128.source    tlps_out
@@ -36,6 +37,7 @@ module nvme_tx_req(
     localparam [2:0] K_IDENT = 3'd2;
     localparam [2:0] K_ZERO  = 3'd3;
     localparam [2:0] K_IRQ   = 3'd4;
+    localparam [2:0] K_LOG   = 3'd5;
 
     localparam [1:0] T_IDLE = 2'd0;
     localparam [1:0] T_HDR  = 2'd1;
@@ -45,6 +47,7 @@ module nvme_tx_req(
     reg [2:0]   kind;
     reg [63:0]  addr;
     reg [127:0] wdata;
+    reg [7:0]   lid;
     reg [11:0]  total_dw;
     reg [11:0]  chunk_dw;
     reg [11:0]  beat_rem;
@@ -63,6 +66,13 @@ module nvme_tx_req(
         .data   ( ident_data    )
     );
 
+    wire [127:0] log_data;
+    nvme_log_data i_log(
+        .lid    ( lid           ),
+        .idx    ( data_idx[9:2] ),
+        .data   ( log_data      )
+    );
+
     // -------------------------------------------------------------------------
     // Pending request length
     // -------------------------------------------------------------------------
@@ -75,13 +85,17 @@ module nvme_tx_req(
     // Data word source (memory order, little endian)
     // -------------------------------------------------------------------------
     wire [31:0] src_dw0 = (kind == K_IDENT) ? ident_data[31:0]   :
+                          (kind == K_LOG)   ? log_data[31:0]     :
                           (kind == K_WR16)  ? wdata[31:0]        :
                           (kind == K_IRQ)   ? wdata[31:0]        : 32'd0;
     wire [31:0] src_dw1 = (kind == K_IDENT) ? ident_data[63:32]  :
+                          (kind == K_LOG)   ? log_data[63:32]    :
                           (kind == K_WR16)  ? wdata[63:32]       : 32'd0;
     wire [31:0] src_dw2 = (kind == K_IDENT) ? ident_data[95:64]  :
+                          (kind == K_LOG)   ? log_data[95:64]    :
                           (kind == K_WR16)  ? wdata[95:64]       : 32'd0;
     wire [31:0] src_dw3 = (kind == K_IDENT) ? ident_data[127:96] :
+                          (kind == K_LOG)   ? log_data[127:96]   :
                           (kind == K_WR16)  ? wdata[127:96]      : 32'd0;
 
     // Wire order (first payload byte is the MSB of the transmitted dword).
@@ -128,6 +142,7 @@ module nvme_tx_req(
             kind     <= K_RD;
             addr     <= 64'd0;
             wdata    <= 128'd0;
+            lid      <= 8'd0;
             total_dw <= 12'd0;
             chunk_dw <= 12'd0;
             beat_rem <= 12'd0;
@@ -141,6 +156,7 @@ module nvme_tx_req(
                         kind     <= req_kind;
                         addr     <= req_addr;
                         wdata    <= req_wdata;
+                        lid      <= req_lid;
                         total_dw <= req_len;
                         chunk_dw <= (req_len > 12'd128) ? 12'd128 : req_len;
                         beat_rem <= (req_len > 12'd128) ? 12'd128 : req_len;

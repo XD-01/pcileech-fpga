@@ -53,10 +53,18 @@ module pcileech_tlps128_bar_controller(
     output [63:0]           nvme_asq,
     output [63:0]           nvme_acq,
     output [15:0]           nvme_sq0_tail,
-    output [127:0]          nvme_msix0,
-    output [127:0]          nvme_msix1,
-    output [127:0]          nvme_msix2,
-    output [127:0]          nvme_msix3
+    output [15:0]           nvme_sq_tail1,
+    output [15:0]           nvme_sq_tail2,
+    output [15:0]           nvme_sq_tail3,
+    output [15:0]           nvme_sq_tail4,
+    input  [4:0]            nvme_msix_sel,
+    output [63:0]           nvme_msix_addr,
+    output [31:0]           nvme_msix_data,
+    output                  nvme_msix_mask,
+    input                   nvme_pba_set,
+    input  [4:0]            nvme_pba_idx,
+    input                   nvme_pba_clr,
+    input  [4:0]            nvme_pba_clr_idx
 );
     
     // ------------------------------------------------------------------------
@@ -164,10 +172,18 @@ module pcileech_tlps128_bar_controller(
         .nvme_asq       ( nvme_asq                      ),
         .nvme_acq       ( nvme_acq                      ),
         .nvme_sq0_tail  ( nvme_sq0_tail                 ),
-        .nvme_msix0     ( nvme_msix0                    ),
-        .nvme_msix1     ( nvme_msix1                    ),
-        .nvme_msix2     ( nvme_msix2                    ),
-        .nvme_msix3     ( nvme_msix3                    )
+        .nvme_sq_tail1  ( nvme_sq_tail1                 ),
+        .nvme_sq_tail2  ( nvme_sq_tail2                 ),
+        .nvme_sq_tail3  ( nvme_sq_tail3                 ),
+        .nvme_sq_tail4  ( nvme_sq_tail4                 ),
+        .nvme_msix_sel  ( nvme_msix_sel                 ),
+        .nvme_msix_addr ( nvme_msix_addr                ),
+        .nvme_msix_data ( nvme_msix_data                ),
+        .nvme_msix_mask ( nvme_msix_mask                ),
+        .nvme_pba_set   ( nvme_pba_set                  ),
+        .nvme_pba_idx   ( nvme_pba_idx                  ),
+        .nvme_pba_clr   ( nvme_pba_clr                  ),
+        .nvme_pba_clr_idx ( nvme_pba_clr_idx            )
     );
     
     pcileech_bar_impl_loopaddr i_bar1(

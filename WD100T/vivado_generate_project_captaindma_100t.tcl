@@ -118,6 +118,7 @@ set files [list \
  [file normalize "${origin_dir}/src/pcileech_bar_impl_nvme.sv"]\
  [file normalize "${origin_dir}/src/nvme_regs.sv"]\
  [file normalize "${origin_dir}/src/nvme_ident_data.sv"]\
+ [file normalize "${origin_dir}/src/nvme_log_data.sv"]\
  [file normalize "${origin_dir}/src/nvme_tx_req.sv"]\
  [file normalize "${origin_dir}/src/nvme_admin.sv"]\
  [file normalize "${origin_dir}/src/pcileech_ft601_cpl_router.sv"]\
@@ -167,7 +168,7 @@ set file "src/pcileech_tlps128_bar_controller.sv"
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
-foreach mw_file { "src/pcileech_bar_impl_nvme.sv" "src/nvme_regs.sv" "src/nvme_ident_data.sv" "src/nvme_tx_req.sv" "src/nvme_admin.sv" "src/pcileech_ft601_cpl_router.sv" "src/pcileech_tlps128_sink_mux5.sv" } {
+foreach mw_file { "src/pcileech_bar_impl_nvme.sv" "src/nvme_regs.sv" "src/nvme_ident_data.sv" "src/nvme_log_data.sv" "src/nvme_tx_req.sv" "src/nvme_admin.sv" "src/pcileech_ft601_cpl_router.sv" "src/pcileech_tlps128_sink_mux5.sv" } {
     set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$mw_file"]]
     set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 }

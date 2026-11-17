@@ -37,6 +37,7 @@ module xhci_regs(
     output [63:0]       erdp,
     output              iman_ie,
     output reg          db0_wr,
+    output reg          xhci_hcrst,
     input               usbsts_eint_set,
     input               iman_ip_set,
     // MSI-X table lookup
@@ -49,8 +50,8 @@ module xhci_regs(
     // Capability constants
     localparam [7:0]  CAPLENGTH  = 8'h20;
     localparam [15:0] HCIVERSION = 16'h0100;
-    localparam [31:0] HCSPARAMS1  = 32'h02000120;   // 2 ports, 1 intr, 32 slots
-    localparam [31:0] HCCPARAMS1  = 32'h0000000D;   // AC64, CSZ, PPC
+    localparam [31:0] HCSPARAMS1  = 32'h04000120;   // 4 ports, 1 intr, 32 slots
+    localparam [31:0] HCCPARAMS1  = 32'h20000005;   // XECP=0x8000, AC64, CSZ
 
     reg [31:0] usbcmd;
     reg        eint;
@@ -116,7 +117,22 @@ module xhci_regs(
             16'h0011: xhci_read = 32'h00000000;         // MFINDEX
             16'h0108: xhci_read = 32'h000002A0;         // PORTSC1: PP=1, PLS=RxDetect
             16'h010C: xhci_read = 32'h000002A0;         // PORTSC2
+            16'h0110: xhci_read = 32'h000002A0;         // PORTSC3 (USB2)
+            16'h0114: xhci_read = 32'h000002A0;         // PORTSC4 (USB2)
             16'h0800: xhci_read = 32'h00000000;         // runtime MFINDEX
+            // Supported Protocol caps at BAR0 + 0x8000 (USB3) and 0x8020 (USB2)
+            16'h2000: xhci_read = 32'h00010802;         // cap id 2, next 8 (0x8020), version 1
+            16'h2001: xhci_read = 32'h20425355;         // name "USB "
+            16'h2002: xhci_read = 32'h00020201;         // port 1..2, protocol USB 3.0
+            16'h2003: xhci_read = 32'h00000014;         // slot type 2, 1 speed id
+            16'h2004: xhci_read = 32'h13880004;         // PSI: 5000 Mb/s
+            16'h2008: xhci_read = 32'h00010002;         // USB2 cap, next 0
+            16'h2009: xhci_read = 32'h20425355;         // name "USB "
+            16'h200A: xhci_read = 32'h00010203;         // port 3..4, protocol USB 2.0
+            16'h200B: xhci_read = 32'h00000031;         // slot type 1, 3 speed ids
+            16'h200C: xhci_read = 32'h000C0001;         // PSI: full speed 12 Mb/s
+            16'h200D: xhci_read = 32'h00030032;         // PSI: low speed 1.5 Mb/s
+            16'h200E: xhci_read = 32'h01E00003;         // PSI: high speed 480 Mb/s
             16'h0808: xhci_read = { 30'd0, ie, ip };    // IMAN
             16'h0809: xhci_read = imod_r;
             16'h080A: xhci_read = { 16'd0, erstsz_r };
@@ -162,6 +178,7 @@ module xhci_regs(
             crcr_wr     <= 1'b0;
             erstba_wr   <= 1'b0;
             db0_wr      <= 1'b0;
+            xhci_hcrst  <= 1'b0;
             for ( i = 0; i < 32; i = i + 1 )
                 msix[i] <= 32'd0;
         end
@@ -169,6 +186,7 @@ module xhci_regs(
             crcr_wr   <= 1'b0;
             erstba_wr <= 1'b0;
             db0_wr    <= 1'b0;
+            xhci_hcrst <= 1'b0;
 
             if ( usbsts_eint_set ) eint <= 1'b1;
             if ( iman_ip_set )     ip   <= 1'b1;
@@ -180,6 +198,7 @@ module xhci_regs(
                     16'h0008: begin
                         usbcmd <= { 27'd0, wr_data[4:0] } & ~32'h00000002;
                         if ( wr_data[1] ) begin          // HCRST
+                            xhci_hcrst <= 1'b1;
                             crcr_r   <= 64'd0;
                             crcr_rcs <= 1'b0;
                             dcbaap_r <= 64'd0;

@@ -45,6 +45,7 @@ module pcileech_pcie_tlp_a7(
     wire [63:0] xhci_erdp;
     wire        xhci_iman_ie;
     wire        xhci_db0_wr;
+    wire        xhci_hcrst;
     wire        xhci_eint_set;
     wire        xhci_ip_set;
     wire [2:0]  xhci_msix_sel;
@@ -76,6 +77,7 @@ module pcileech_pcie_tlp_a7(
         .xhci_erdp      ( xhci_erdp                     ),
         .xhci_iman_ie   ( xhci_iman_ie                  ),
         .xhci_db0_wr    ( xhci_db0_wr                   ),
+        .xhci_hcrst     ( xhci_hcrst                    ),
         .xhci_eint_set  ( xhci_eint_set                 ),
         .xhci_ip_set    ( xhci_ip_set                   ),
         .xhci_msix_sel  ( xhci_msix_sel                 ),
@@ -168,6 +170,7 @@ module pcileech_pcie_tlp_a7(
         .erdp           ( xhci_erdp                     ),
         .iman_ie        ( xhci_iman_ie                  ),
         .db0_wr         ( xhci_db0_wr                   ),
+        .hcrst          ( xhci_hcrst                    ),
         .usbsts_eint_set( xhci_eint_set                 ),
         .iman_ip_set    ( xhci_ip_set                   ),
         .msix_sel       ( xhci_msix_sel                 ),

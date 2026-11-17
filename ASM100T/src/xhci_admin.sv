@@ -30,6 +30,7 @@ module xhci_admin(
     input [63:0]        erdp,
     input               iman_ie,
     input               db0_wr,
+    input               hcrst,
     output reg          usbsts_eint_set,
     output reg          iman_ip_set,
     output reg [2:0]    msix_sel,
@@ -211,6 +212,20 @@ module xhci_admin(
             usbsts_eint_set <= 1'b0;
             iman_ip_set  <= 1'b0;
         end
+        else if ( hcrst ) begin
+            state        <= X_IDLE;
+            fetch_req    <= 1'b0;
+            cmd_ptr      <= 64'd0;
+            cmd_cycle    <= 1'b0;
+            slot_map     <= 32'd0;
+            erst_loaded  <= 1'b0;
+            evt_off      <= 64'd0;
+            evt_cycle    <= 1'b1;
+            irq_sent     <= 1'b0;
+            req_valid_r  <= 1'b0;
+            usbsts_eint_set <= 1'b0;
+            iman_ip_set  <= 1'b0;
+        end
         else begin
             usbsts_eint_set <= 1'b0;
             iman_ip_set     <= 1'b0;
@@ -233,6 +248,7 @@ module xhci_admin(
             case ( state )
                 // -----------------------------------------------------------------
                 X_IDLE: begin
+                    irq_sent <= 1'b0;
                     if ( fetch_req && usbcmd_rs && (crcr[63:4] != 60'd0) ) begin
                         cur_trb     <= cmd_ptr;
                         req_kind_r  <= K_RD;

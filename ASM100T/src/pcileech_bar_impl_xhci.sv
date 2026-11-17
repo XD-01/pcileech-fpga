@@ -31,6 +31,7 @@ module pcileech_bar_impl_xhci(
     output [63:0]       xhci_erdp,
     output              xhci_iman_ie,
     output              xhci_db0_wr,
+    output              xhci_hcrst,
     input               xhci_eint_set,
     input               xhci_ip_set,
     // MSI-X table lookup
@@ -66,6 +67,7 @@ module pcileech_bar_impl_xhci(
         .erdp               ( xhci_erdp             ),
         .iman_ie            ( xhci_iman_ie          ),
         .db0_wr             ( xhci_db0_wr           ),
+        .xhci_hcrst         ( xhci_hcrst             ),
         .usbsts_eint_set    ( xhci_eint_set         ),
         .iman_ip_set        ( xhci_ip_set           ),
         .msix_sel           ( xhci_msix_sel         ),

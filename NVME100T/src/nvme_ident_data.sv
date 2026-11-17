@@ -3,7 +3,7 @@
 
 module nvme_ident_data(
     input  [7:0]   idx,
-    output [127:0] data
+    output reg [127:0] data
 );
 
     always @ * begin

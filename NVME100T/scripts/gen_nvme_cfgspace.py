@@ -132,7 +132,7 @@ def write_identify_sv(path):
     lines.append("")
     lines.append("module nvme_ident_data(")
     lines.append("    input  [7:0]   idx,")
-    lines.append("    output [127:0] data")
+    lines.append("    output reg [127:0] data")
     lines.append(");")
     lines.append("")
     lines.append("    always @ * begin")

@@ -49,9 +49,9 @@ module xhci_regs(
 
     // Capability constants
     localparam [7:0]  CAPLENGTH  = 8'h20;
-    localparam [15:0] HCIVERSION = 16'h0100;
+    localparam [15:0] HCIVERSION = 16'h0110;
     localparam [31:0] HCSPARAMS1  = 32'h02000120;   // 2 ports, 1 intr, 32 slots
-    localparam [31:0] HCCPARAMS1  = 32'h00000005;   // AC64, CSZ
+    localparam [31:0] HCCPARAMS1  = 32'h20000005;   // XECP=0x8000, AC64, CSZ
 
     reg [31:0] usbcmd;
     reg        eint;
@@ -118,6 +118,12 @@ module xhci_regs(
             16'h0108: xhci_read = 32'h000002A0;         // PORTSC1: PP=1, PLS=RxDetect
             16'h010C: xhci_read = 32'h000002A0;         // PORTSC2
             16'h0800: xhci_read = 32'h00000000;         // runtime MFINDEX
+            // Supported Protocol extended capability at BAR0 + 0x8000
+            16'h2000: xhci_read = 32'h00010002;         // cap id 2, next 0, version 1
+            16'h2001: xhci_read = 32'h20425355;         // name "USB "
+            16'h2002: xhci_read = 32'h00030201;         // port 1..2, protocol USB 3.1
+            16'h2003: xhci_read = 32'h00000013;         // slot type 3, 1 speed id
+            16'h2004: xhci_read = 32'h27100001;         // PSI: 10000 Mb/s
             16'h0808: xhci_read = { 30'd0, ie, ip };    // IMAN
             16'h0809: xhci_read = imod_r;
             16'h080A: xhci_read = { 16'd0, erstsz_r };

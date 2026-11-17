@@ -248,6 +248,7 @@ module xhci_admin(
             case ( state )
                 // -----------------------------------------------------------------
                 X_IDLE: begin
+                    irq_sent <= 1'b0;
                     if ( fetch_req && usbcmd_rs && (crcr[63:4] != 60'd0) ) begin
                         cur_trb     <= cmd_ptr;
                         req_kind_r  <= K_RD;
